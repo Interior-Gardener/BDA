@@ -158,7 +158,7 @@ route('sales', {
       ${card('Devices', 'Revenue by ordering device', '<div class="chart sm" id="c-dev"></div>')}
       ${card('Acquisition channels', 'Revenue by customer acquisition channel', '<div class="chart sm" id="c-chan"></div>')}
     </div>
-    ${card('Sale-event uplift', 'Average daily revenue during each sale vs the non-sale baseline', '<div class="chart" id="c-camp"></div>')}`;
+    ${card('Sale-event uplift', 'Average daily orders & revenue during each sale vs the 28 non-sale days before it — revenue uplift is net of sale discounts', '<div class="chart" id="c-camp"></div>')}`;
 
     const S = series();
     // ---- static charts
@@ -210,10 +210,13 @@ route('sales', {
     dimBar('#c-chan', dims.acquisition_channel || []);
     const cp = camps.slice().sort((a, b) => a.start.localeCompare(b.start));
     chart('#c-camp', {
-      tooltip: { trigger: 'axis', ...tooltipStyle(), formatter: (ps) => { const c = cp[ps[0].dataIndex]; return `<b>${c._id}</b><br>${c.days} days · ${fmt.inr(c.revenue)}<br>Avg/day ${fmt.inr(c.avg_daily_revenue)}<br>Uplift <b>${c.uplift_pct > 0 ? '+' : ''}${c.uplift_pct}%</b>`; } },
+      legend: { show: true, top: 0, right: 0, textStyle: { color: css('--text-2') } },
+      grid: { left: 8, right: 8, top: 34, bottom: 8, containLabel: true },
+      tooltip: { trigger: 'axis', ...tooltipStyle(), formatter: (ps) => { const c = cp[ps[0].dataIndex]; return `<b>${c._id}</b><br>${c.days} days · ${fmt.inr(c.revenue)}<br>${c.avg_daily_orders} orders/day vs ${c.baseline_daily_orders} baseline<br>Order uplift <b>${c.order_uplift_pct > 0 ? '+' : ''}${c.order_uplift_pct}%</b><br>Revenue uplift <b>${c.uplift_pct > 0 ? '+' : ''}${c.uplift_pct}%</b>`; } },
       xAxis: xAxis(cp.map((c) => `${c.event.replace(' Sale', '')} '${String(c.year).slice(2)}`), { axisLabel: { rotate: 35, interval: 0, fontSize: 10 } }),
       yAxis: yAxis((v) => `${v}%`),
-      series: [barSeries('Uplift', cp.map((c) => ({ value: c.uplift_pct, itemStyle: { color: c.uplift_pct >= 0 ? S[0] : S[7], borderRadius: c.uplift_pct >= 0 ? [4, 4, 0, 0] : [0, 0, 4, 4] } })), S[0])],
+      series: [barSeries('Order uplift', cp.map((c) => ({ value: c.order_uplift_pct, itemStyle: { color: S[0], borderRadius: c.order_uplift_pct >= 0 ? [4, 4, 0, 0] : [0, 0, 4, 4] } })), S[0]),
+        barSeries('Revenue uplift (net of discount)', cp.map((c) => ({ value: c.uplift_pct, itemStyle: { color: S[1], borderRadius: c.uplift_pct >= 0 ? [4, 4, 0, 0] : [0, 0, 4, 4] } })), S[1])],
     });
 
     // ---- filterable charts
