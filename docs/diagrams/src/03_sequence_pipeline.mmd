@@ -1,0 +1,26 @@
+sequenceDiagram
+  autonumber
+  actor DE as Data Engineer
+  participant CLI as run_pipeline.py
+  participant GEN as Data Generator
+  participant SP as Spark (Driver + Executors)
+  participant ML as Spark MLlib
+  participant DB as MongoDB
+  DE->>CLI: python run_pipeline.py --generate
+  CLI->>DB: ping()
+  DB-->>CLI: ok
+  CLI->>GEN: generate(scale)
+  GEN-->>CLI: raw CSV / JSON-lines files
+  CLI->>SP: read_raw() (bronze)
+  SP->>SP: clean, validate, de-duplicate, enrich, sessionise (silver)
+  SP-->>CLI: data-quality report
+  loop every analytics stage
+    SP->>SP: aggregate (Spark SQL, window functions)
+    SP->>DB: foreachPartition → insert_many (gold)
+  end
+  loop every ML stage
+    CLI->>ML: fit / evaluate models
+    ML->>DB: predictions, rules, model_registry
+  end
+  CLI->>DB: insert pipeline_runs (timings, DQ, stats)
+  CLI-->>DE: ✔ Pipeline success

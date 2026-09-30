@@ -1,0 +1,22 @@
+sequenceDiagram
+  autonumber
+  actor U as Marketing Manager
+  participant UI as Dashboard (Browser)
+  participant API as FastAPI
+  participant DB as MongoDB
+  U->>UI: open #/churn
+  UI->>API: GET /api/churn/summary
+  API->>DB: find churn_summary + model_registry
+  API->>DB: aggregate customers by segment
+  DB-->>API: documents
+  API-->>UI: JSON (metrics, ROC, importances)
+  UI-->>U: render charts
+  U->>UI: move "Days since last order" slider
+  UI->>API: POST /api/churn/simulate {features}
+  API->>API: standardise → logistic model → probability + drivers
+  API-->>UI: {probability, risk, drivers}
+  UI-->>U: update gauge & driver bars
+  U->>UI: click "Export CSV"
+  UI->>API: GET /api/churn/customers.csv?risk=High
+  API->>DB: find customers (risk=High) sort clv_12m
+  API-->>U: shopsense_winback_high.csv

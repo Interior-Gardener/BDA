@@ -1,0 +1,17 @@
+stateDiagram-v2
+  [*] --> Idle
+  Idle --> CheckingMongo: run_pipeline.py
+  CheckingMongo --> Failed: MongoDB unreachable
+  CheckingMongo --> Generating: --generate or no raw data
+  CheckingMongo --> Ingesting: raw data present
+  Generating --> Ingesting
+  Ingesting --> Cleaning: bronze DataFrames
+  Cleaning --> Analytics: silver DataFrames + DQ report
+  Analytics --> MachineLearning: gold collections written
+  Analytics --> Logging: --skip-ml
+  MachineLearning --> Logging: models + predictions written
+  Ingesting --> Failed: exception
+  Cleaning --> Failed: exception
+  MachineLearning --> Failed: exception
+  Failed --> Logging
+  Logging --> [*]: pipeline_runs document saved
