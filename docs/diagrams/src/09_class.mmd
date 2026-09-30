@@ -1,0 +1,86 @@
+classDiagram
+  direction LR
+  class Generator {
+    +scale: str
+    +n_customers: int
+    +build_calendar()
+    +build_products()
+    +build_customers()
+    +build_orders()
+    +build_events()
+    +inject_noise()
+    +write() dict
+  }
+  class Pipeline {
+    +run_pipeline(generate, scale, skip_ml) bool
+  }
+  class Run {
+    +id: str
+    +stages: list
+    +stage(group, name, fn, *args)
+  }
+  class Ingest {
+    +read_raw(spark) dict
+  }
+  class Clean {
+    +clean(spark, bronze) (silver, dq, ref)
+  }
+  class SalesAnalytics {
+    +kpis() +daily_and_monthly()
+    +breakdowns() +campaigns()
+    +product_stats()
+  }
+  class BehaviourAnalytics {
+    +funnel() +traffic() +cohorts()
+    +orders_collection() +customer_profiles()
+  }
+  class Segmentation {
+    +rfm_features(s, ref)
+    +run(spark, s, ref)
+  }
+  class Churn {
+    +build_features(s, as_of)
+    +run(spark, s, ref)
+  }
+  class Recommender {
+    +interactions(s)
+    +run(spark, s, ref)
+  }
+  class Basket {
+    +run(spark, s, ref)
+  }
+  class HybridForecaster {
+    +fit(spark, dates, values)
+    +predict(spark, dates)
+    -smear: float
+    -sigma: float
+  }
+  class MongoHelper {
+    +get_db()
+    +write_df(df, collection)
+    +write_docs(collection, docs)
+    +bulk_update(collection, updates)
+  }
+  class FastAPIApp {
+    +overview() +sales_trend()
+    +churn_simulate() +customer()
+    +recommendations() +forecast()
+  }
+  Pipeline --> Run
+  Pipeline --> Generator
+  Pipeline --> Ingest
+  Pipeline --> Clean
+  Pipeline --> SalesAnalytics
+  Pipeline --> BehaviourAnalytics
+  Pipeline --> Segmentation
+  Pipeline --> Churn
+  Pipeline --> Recommender
+  Pipeline --> Basket
+  Pipeline --> HybridForecaster
+  SalesAnalytics ..> MongoHelper
+  BehaviourAnalytics ..> MongoHelper
+  Segmentation ..> MongoHelper
+  Churn ..> MongoHelper
+  Recommender ..> MongoHelper
+  Basket ..> MongoHelper
+  FastAPIApp ..> MongoHelper

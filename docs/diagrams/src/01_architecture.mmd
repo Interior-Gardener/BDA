@@ -1,0 +1,34 @@
+flowchart LR
+  subgraph SRC["① Data Sources (Landing Zone)"]
+    A1[customers.csv]
+    A2[products.jsonl]
+    A3[orders.csv<br/>order_items.csv]
+    A4[events/*.jsonl<br/>clickstream logs]
+  end
+  subgraph SPARK["② Apache Spark 3.5 (PySpark)"]
+    B1[Bronze<br/>schema-on-read ingest]
+    B2[Silver<br/>clean · validate · de-dup<br/>enrich · sessionise]
+    B3[Gold analytics<br/>Spark SQL · window functions]
+    B4[Spark MLlib<br/>K-Means · LR/RF/GBT · ALS<br/>FP-Growth · RF regressor]
+    PQ[(Parquet<br/>data lake)]
+  end
+  subgraph MDB["③ MongoDB 8 (Serving Store)"]
+    C1[(Gold collections<br/>KPIs · sales · funnel · cohorts)]
+    C2[(customers · orders<br/>embedded documents)]
+    C3[(model_registry<br/>predictions · rules)]
+  end
+  subgraph WEB["④ Presentation"]
+    D1[FastAPI REST API<br/>+ Swagger /docs]
+    D2[Interactive Dashboard<br/>ECharts · 11 pages]
+    D3[CSV campaign export<br/>What-if simulator]
+  end
+  A1 & A2 & A3 & A4 --> B1 --> B2
+  B2 --> B3
+  B2 --> B4
+  B2 -.optional.-> PQ
+  B3 --> C1
+  B3 --> C2
+  B4 --> C3
+  B4 --> C2
+  C1 & C2 & C3 --> D1 --> D2
+  D1 --> D3

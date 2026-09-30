@@ -1,0 +1,23 @@
+flowchart TB
+  E1[/"E-commerce sources"/]
+  E2[/"Business users"/]
+  P1(("1.0<br/>Ingest<br/>(Bronze)"))
+  P2(("2.0<br/>Clean & Enrich<br/>(Silver)"))
+  P3(("3.0<br/>Aggregate<br/>Analytics (Gold)"))
+  P4(("4.0<br/>Train & Score<br/>ML Models"))
+  P5(("5.0<br/>Serve API &<br/>Dashboard"))
+  D1[("D1 Raw files<br/>data/raw")]
+  D2[("D2 Parquet lake<br/>data/lake")]
+  D3[("D3 MongoDB gold<br/>collections")]
+  D4[("D4 MongoDB model<br/>registry & predictions")]
+  E1 --> D1 --> P1
+  P1 -- typed DataFrames --> P2
+  P2 -- silver tables --> D2
+  P2 -- orders, lines, sessions --> P3
+  P2 -- features --> P4
+  P3 -- KPIs, sales, funnel, cohorts --> D3
+  P4 -- segments, churn scores,<br/>recommendations, rules, forecasts --> D4
+  D3 --> P5
+  D4 --> P5
+  E2 -- requests --> P5
+  P5 -- JSON / charts / CSV --> E2

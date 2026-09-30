@@ -1,0 +1,64 @@
+erDiagram
+  CUSTOMERS ||--o{ ORDERS : places
+  ORDERS ||--|{ ORDER_ITEMS : "embeds (items[])"
+  PRODUCTS ||--o{ ORDER_ITEMS : "appears in"
+  CUSTOMERS ||--o| RECOMMENDATIONS : receives
+  RECOMMENDATIONS }o--o{ PRODUCTS : suggests
+  SEGMENTS ||--o{ CUSTOMERS : groups
+  PRODUCTS ||--o{ BASKET_RULES : "antecedent / consequent"
+  CUSTOMERS {
+    string _id PK "C000123"
+    string full_name
+    string city
+    string segment FK
+    object rfm "R, F, M, score"
+    float churn_probability
+    string churn_risk
+    float clv_12m
+    object churn_features
+  }
+  ORDERS {
+    string _id PK "ORD0001234"
+    string customer_id FK
+    datetime order_ts
+    string status
+    string payment_method
+    float net_amount
+    array items
+  }
+  ORDER_ITEMS {
+    int line_no
+    string product_id FK
+    int quantity
+    float unit_price
+    float discount_pct
+    int rating
+  }
+  PRODUCTS {
+    string _id PK "P00042"
+    string product_name
+    string category
+    float list_price
+    float revenue
+    float view_to_buy_pct
+    array similar "ALS"
+    array bought_together "FP-Growth"
+  }
+  SEGMENTS {
+    string _id PK "Champions"
+    int customers
+    float revenue_share_pct
+    string action
+  }
+  RECOMMENDATIONS {
+    string _id PK "customer_id"
+    array items "top-10 ranked"
+  }
+  BASKET_RULES {
+    string level
+    array antecedent
+    array consequent
+    float support
+    float confidence
+    float lift
+  }

@@ -1,0 +1,7 @@
+flowchart LR
+  R[("Raw landing zone<br/>~1.4 M records · 315 MB")] --> B["🥉 Bronze<br/>explicit schemas<br/>PERMISSIVE parsing"]
+  B --> S["🥈 Silver<br/>• trim / canonicalise values<br/>• drop duplicates & invalid rows<br/>• join products, customers<br/>• revenue, cost, profit, discount<br/>• sessionise clickstream"]
+  S --> G["🥇 Gold<br/>KPIs · daily × category<br/>monthly · geo · funnel · cohorts<br/>Customer 360 · product stats"]
+  S --> M["🤖 ML features<br/>RFM · churn features<br/>implicit ratings · baskets<br/>daily time-series"]
+  G --> DB[(MongoDB)]
+  M --> DB

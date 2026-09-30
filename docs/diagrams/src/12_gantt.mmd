@@ -1,0 +1,20 @@
+gantt
+  title ShopSense project plan (Semester VII)
+  dateFormat YYYY-MM-DD
+  axisFormat %d %b
+  section Planning
+  Problem definition & literature survey :done, a1, 2026-07-01, 14d
+  Requirement specification & design     :done, a2, after a1, 10d
+  section Data engineering
+  Synthetic data generator               :done, b1, after a2, 7d
+  Spark ETL (bronze / silver)            :done, b2, after b1, 10d
+  Gold analytics → MongoDB               :done, b3, after b2, 10d
+  section Machine learning
+  Segmentation & churn                   :done, c1, after b3, 12d
+  Recommendations & market basket        :done, c2, after c1, 8d
+  Forecasting & anomaly detection        :done, c3, after c2, 8d
+  section Application
+  REST API & dashboard                   :done, d1, after b3, 25d
+  Testing & tuning                       :done, d2, after c3, 7d
+  section Documentation
+  Report, README & presentation          :active, e1, after d2, 10d

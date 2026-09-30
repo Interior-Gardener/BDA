@@ -1,0 +1,28 @@
+flowchart LR
+  BA(["👤 Business Analyst"])
+  MM(["👤 Marketing Manager"])
+  DE(["👤 Data Engineer"])
+  API(["🖥️ External System<br/>(CRM / BI tool)"])
+  subgraph SYS["ShopSense System"]
+    U1([View KPI overview])
+    U2([Analyse sales by date,<br/>category, geography])
+    U3([Explore conversion funnel<br/>& cohort retention])
+    U4([View customer segments])
+    U5([Predict & explain churn])
+    U6([Run what-if churn simulation])
+    U7([Export win-back list CSV])
+    U8([Get product recommendations])
+    U9([Discover frequently-bought-together rules])
+    U10([View sales forecast & anomalies])
+    U11([Search Customer 360 profile])
+    U12([Generate / ingest data])
+    U13([Run Spark pipeline])
+    U14([Monitor data quality & models])
+    U15([Query REST API])
+  end
+  BA --- U1 & U2 & U3 & U10 & U11
+  MM --- U4 & U5 & U6 & U7 & U8 & U9 & U11
+  DE --- U12 & U13 & U14
+  API --- U15
+  U13 -. includes .-> U12
+  U5 -. extends .-> U6
