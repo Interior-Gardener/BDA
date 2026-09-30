@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.env
+
+# Generated data & Spark artefacts
+data/
+spark-warehouse/
+metastore_db/
+derby.log
+*.crc
+checkpoint/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Office lock files
+~$*
+.~lock.*
