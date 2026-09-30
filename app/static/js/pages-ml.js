@@ -378,11 +378,11 @@ route('forecast', {
       ${kpi({ label: 'Forecast · next 30 days', value: fmt.inr(f.next_30_days), foot: `${delta((f.next_30_days / f.last_30_days - 1) * 100)} vs last 30 days`, ic: 'forecast' })}
       ${kpi({ label: 'Daily MAPE (hold-out)', value: fmt.pct(ev.mape), foot: `last ${f.holdout.length} days held out`, ic: 'target' })}
       ${kpi({ label: 'Weekly MAPE', value: fmt.pct(ev.weekly_mape), foot: 'error on weekly totals', ic: 'percent' })}
-      ${kpi({ label: 'R² (hold-out)', value: ev.r2.toFixed(3), foot: `RMSE ${fmt.inr(ev.rmse)}/day`, ic: 'bolt' })}
+      ${kpi({ label: 'Error vs seasonal naïve', value: fmt.pct((1 - ev.mape / (f.evaluation.find((x) => x.model.startsWith('Seasonal'))?.mape || ev.mape)) * 100) + ' lower', foot: `daily MAPE · MAE ${fmt.inr(ev.mae)}/day`, ic: 'bolt' })}
     </div>
     ${card(`Revenue forecast — ${esc(series_)}`, 'History, model fit and the next 60 days with 80% / 95% prediction intervals', '<div class="chart xl" id="c-fc"></div>')}
     <div class="grid g2">
-      ${card('Model vs baselines', 'Hold-out window error (lower is better)', '<div id="f-eval"></div>')}
+      ${card('Model vs baselines', 'Hold-out window error (lower is better) · daily revenue is noisy because a few high-value baskets dominate some days, so weekly error is also shown', '<div id="f-eval"></div>')}
       ${card('Hold-out check', 'Actual vs predicted on unseen days', '<div class="chart" id="c-hold"></div>')}
     </div>
     ${card('Forecast by category', 'Next 30 days vs last 30 days', '<div id="f-cats"></div>')}

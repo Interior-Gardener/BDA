@@ -211,13 +211,18 @@ def campaigns(spark, s):
         # baseline = average of the non-sale days in the 28 days before the event
         # (a local baseline removes the effect of long-term business growth)
         st = date.fromisoformat(doc["start"])
-        window = [by_day[st - timedelta(days=i)][0] for i in range(1, 29)
+        window = [by_day[st - timedelta(days=i)] for i in range(1, 29)
                   if (st - timedelta(days=i)) in by_day and (st - timedelta(days=i)) not in tagged]
-        base_avg = sum(window) / len(window) if window else None
+        base_rev = sum(w[0] for w in window) / len(window) if window else None
+        base_ord = sum(w[1] for w in window) / len(window) if window else None
         doc["revenue"] = round(doc["revenue"], 2)
         doc["avg_daily_revenue"] = round(doc["revenue"] / doc["days"], 2)
-        doc["uplift_pct"] = round((doc["avg_daily_revenue"] / base_avg - 1) * 100, 2) if base_avg else None
-        doc["baseline_daily_revenue"] = round(base_avg, 2) if base_avg else None
+        doc["avg_daily_orders"] = round(doc["orders"] / doc["days"], 1)
+        # revenue uplift is net of the sale discount; order uplift measures demand
+        doc["uplift_pct"] = round((doc["avg_daily_revenue"] / base_rev - 1) * 100, 2) if base_rev else None
+        doc["order_uplift_pct"] = round((doc["avg_daily_orders"] / base_ord - 1) * 100, 2) if base_ord else None
+        doc["baseline_daily_revenue"] = round(base_rev, 2) if base_rev else None
+        doc["baseline_daily_orders"] = round(base_ord, 1) if base_ord else None
     return write_docs("campaigns", sorted((d for d in docs.values() if d["uplift_pct"] is not None),
                                          key=lambda x: x["start"]))
 
