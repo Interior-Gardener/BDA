@@ -352,8 +352,8 @@ def _churn_logit(features):
 
 
 @app.post("/api/churn/simulate", tags=["Churn"])
-def churn_simulate(features: dict = Body(..., example={"recency_days": 120, "frequency": 3, "monetary": 9000,
-                                                       "preferred_device": "Mobile App"})):
+def churn_simulate(features: dict = Body(..., examples=[{"recency_days": 120, "frequency": 3, "monetary": 9000,
+                                                          "preferred_device": "Mobile App"}])):
     """What-if analysis with the exported (explainable) logistic-regression churn model."""
     prob, contrib = _churn_logit(features)
     return {"probability": round(prob, 4),
