@@ -22,6 +22,7 @@ from pyspark.sql import functions as F
 from shopsense.mongo import bulk_update, get_db, write_df
 
 K = 10
+CANDIDATES = 150   # heavy buyers already own many top items, so over-fetch before filtering
 
 
 def interactions(s):
@@ -90,7 +91,7 @@ def run(spark, s, ref):
     grid = []
     for rank, reg, alpha in [(16, 0.05, 15.0), (32, 1.0, 5.0), (64, 1.0, 5.0), (64, 1.0, 10.0)]:
         m = _als(rank, reg, alpha).fit(train)
-        recs = _recommend(m, test_users, K + 30).join(umap, "uid").join(imap, "iid")
+        recs = _recommend(m, test_users, CANDIDATES).join(umap, "uid").join(imap, "iid")
         top = _top_k_excluding(recs.select("customer_id", "product_id", "score"), seen_train, K)
         hr, ndcg = _rank_metrics(top, holdout)
         grid.append({"rank": rank, "regParam": reg, "alpha": alpha, "hit_rate": hr, "ndcg": ndcg})
@@ -98,7 +99,7 @@ def run(spark, s, ref):
 
     pop = train.groupBy("product_id").agg(F.sum("buys").alias("score"))
     pop_recs = holdout.select("customer_id").crossJoin(
-        pop.orderBy(F.desc("score")).limit(K + 30))
+        pop.orderBy(F.desc("score")).limit(CANDIDATES))
     pop_top = _top_k_excluding(pop_recs, seen_train, K)
     pop_hr, pop_ndcg = _rank_metrics(pop_top, holdout)
 
@@ -106,7 +107,7 @@ def run(spark, s, ref):
     model = _als(best["rank"], best["regParam"], best["alpha"]).fit(data)
     seen = data.filter("buys > 0").select("customer_id", "product_id")
     users = umap.select("uid")
-    recs = _recommend(model, users, K + 30).join(umap, "uid").join(imap, "iid") \
+    recs = _recommend(model, users, CANDIDATES).join(umap, "uid").join(imap, "iid") \
         .select("customer_id", "product_id", "score")
     top = _top_k_excluding(recs, seen, K)
     cats = s["lines"].filter("is_revenue").select("customer_id", "category").distinct() \

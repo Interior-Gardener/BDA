@@ -43,6 +43,7 @@ async def main(base, cid, video):
                 suffix = "" if theme == "dark" else "_light"
                 await page.screenshot(path=str(SHOTS / f"{name}{suffix}.png"))
                 if theme == "light":             # full-length pages (used in the report)
+                    await page.add_style_tag(content=".topbar{position:static!important}")
                     await page.screenshot(path=str(SHOTS / "full" / f"{name}_full.png"), full_page=True)
             await ctx.close()
 
