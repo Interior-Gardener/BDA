@@ -1,0 +1,14 @@
+stateDiagram-v2
+  [*] --> Visitor: first session
+  Visitor --> Prospect: browses / adds to cart
+  Prospect --> NewCustomer: first purchase
+  Visitor --> [*]: never returns
+  NewCustomer --> Active: repeat purchase
+  Active --> Champion: high R, F, M scores
+  Champion --> Active: frequency drops
+  Active --> AtRisk: no order > 90 days\n(churn probability ≥ 0.7)
+  Champion --> AtRisk: engagement decays
+  AtRisk --> Active: win-back campaign succeeds
+  AtRisk --> Churned: no order in label window
+  Churned --> Active: reactivated
+  Churned --> [*]

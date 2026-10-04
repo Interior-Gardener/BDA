@@ -1,0 +1,18 @@
+flowchart TB
+  S([Start]) --> A[Load silver orders, lines, sessions]
+  A --> B[cutoff = as-of date − 90 days]
+  B --> C[Build 21 behavioural features<br/>from data before cutoff]
+  C --> D[Label = 1 if no successful order<br/>in the 90 days after cutoff]
+  D --> E[Random 80/20 train–test split]
+  E --> F1[Logistic Regression<br/>3-fold CV on regParam]
+  E --> F2[Random Forest<br/>150 trees, depth 8]
+  E --> F3[Gradient-Boosted Trees<br/>50 iterations, depth 5]
+  F1 & F2 & F3 --> G[Evaluate on test set:<br/>AUC, PR-AUC, precision, recall, F1, ROC]
+  G --> H{Pick best AUC}
+  H --> I[Rebuild features as of today]
+  I --> J[Score all customers → probability]
+  J --> K[Risk band: High ≥ 0.7, Medium ≥ 0.4, Low]
+  K --> L["Compute 12-month CLV = spend run-rate × (1 − p)"]
+  L --> M[Export logistic model coefficients]
+  M --> N[(Write to MongoDB:<br/>customers, churn_summary, model_registry)]
+  N --> Z([End])

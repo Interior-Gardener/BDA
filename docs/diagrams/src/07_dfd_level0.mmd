@@ -1,0 +1,10 @@
+flowchart LR
+  E1[/"E-commerce platform<br/>(orders, catalogue, clickstream)"/]
+  E2[/"Business users<br/>(analysts, marketing)"/]
+  E3[/"Data engineer"/]
+  P0(("0<br/>ShopSense<br/>Analytics System"))
+  E1 -- raw orders, products,<br/>customers, events --> P0
+  E3 -- run / schedule pipeline --> P0
+  P0 -- run log, DQ report --> E3
+  E2 -- filters, searches,<br/>what-if inputs --> P0
+  P0 -- dashboards, KPIs, forecasts,<br/>segments, churn lists,<br/>recommendations --> E2

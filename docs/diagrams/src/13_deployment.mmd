@@ -1,0 +1,21 @@
+flowchart LR
+  subgraph PC["Developer laptop / college lab PC (Windows · macOS · Linux)"]
+    subgraph JVM["Java 17 JVM"]
+      SD[Spark Driver]
+      EX1[Executor thread 1]
+      EX2[Executor thread …n]
+    end
+    subgraph PYW["Python 3.11 venv"]
+      PW[PySpark workers<br/>pymongo writers]
+      UV[Uvicorn + FastAPI<br/>:8000]
+    end
+    MG[(MongoDB 8<br/>mongod :27017)]
+    FS[/Local disk<br/>data/raw · data/lake/]
+    BR[Web browser]
+  end
+  FS --> SD
+  SD <--> EX1 & EX2
+  EX1 & EX2 <--> PW
+  PW --> MG
+  UV <--> MG
+  BR <-- HTTP / JSON --> UV
